@@ -1,0 +1,9 @@
+
+php_flag xdebug.remote_enable Off
+php_value auto_prepend_file "../demo/bootstrap.php"
+php_value error_reporting -1
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php [L,QSA]
