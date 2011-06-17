@@ -5,6 +5,7 @@ class Router
     const DELIM = '/';
     const MARK = ':';
     const MARKNUMERIC = '#';
+    const MARKECHO = '.';
     const ALTERNATE = '|';
     const METHODS = 0;
     const PATHSPEC = 1;
@@ -32,7 +33,8 @@ class Router
         if (!isset(self::$allowedMethods[$method])) {
            throw new Exception\InvalidRequest("$method request method not allowed");
         }
-        $parts = explode(self::DELIM, trim($_SERVER['REDIRECT_URL'], self::DELIM));
+        $path = isset($_SERVER['REDIRECT_URL'])?$_SERVER['REDIRECT_URL']:'';
+        $parts = explode(self::DELIM, trim($path, self::DELIM));
 
         foreach ($this->routes as $route) {
             if(false === strpos($route[self::METHODS], $method)) {
@@ -54,20 +56,27 @@ class Router
                     } else {
                         throw new Exception\InvalidParameter("$part must be an integer in $spec");
                     }
+                } else if($part{0} === self::MARKECHO) {
+                    $partName = substr($part, 1);
+                    $vars[$partName] = $partName;
                 } else if ($part === $parts[$i]) {
                     // matches
                 } else {
                     continue(2);
                 }
             }
+
             $handler = $route[self::CONTROLLER];
 
             $class = $this->namespace . '\\' . $handler;
-            $object = new $class();
+
+            $object = new $class($vars);
+
 
             foreach($vars as $key => $value) {
                 $object->$key = $value;
             }
+
 
             if(isset($route[self::OVERRIDE_METHOD])) {
                 $method = $route[self::OVERRIDE_METHOD];

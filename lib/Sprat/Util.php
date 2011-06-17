@@ -7,7 +7,7 @@ class Util
         $base = array(
             'scheme' => 'http',
             'host' => $_SERVER['HTTP_HOST'],
-            'path' => $_SERVER['REDIRECT_URL'],
+            'path' => isset($_SERVER['REDIRECT_URL'])?$_SERVER['REDIRECT_URL']:'',
             'query' => http_build_query($_GET),
         );
 
